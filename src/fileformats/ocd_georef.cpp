@@ -20,14 +20,12 @@
 
 #include "ocd_georef.h"
 
-#include <list>
-
 #include <QObject>
 
 #include "core/crs_template.h"
 
 Georeferencing OcdGeoref::georefFromString(const QString& param_string,
-                                           std::list<QString>& warnings)
+                                           const std::function<void(const QString&)>& add_warning)
 {
 	const QChar* unicode = param_string.unicode();
 
@@ -79,7 +77,7 @@ Georeferencing OcdGeoref::georefFromString(const QString& param_string,
 
 	if (!combined_grid_zone.isEmpty())
 	{
-		applyGridAndZone(georef, combined_grid_zone, warnings);
+		applyGridAndZone(georef, combined_grid_zone, add_warning);
 	}
 
 	if (x_ok && y_ok)
@@ -89,10 +87,10 @@ Georeferencing OcdGeoref::georefFromString(const QString& param_string,
 
 	return georef;
 }
-
+	
 void OcdGeoref::applyGridAndZone(Georeferencing& georef,
-                                        const QString& combined_grid_zone,
-                                        std::list<QString>& warnings)
+                                 const QString& combined_grid_zone,
+                                 const std::function<void(const QString&)>& add_warning)
 {
 	bool zone_ok = false;
 	const CRSTemplate* crs_template = nullptr;
@@ -158,7 +156,7 @@ void OcdGeoref::applyGridAndZone(Georeferencing& georef,
 
 	if (spec.isEmpty())
 	{
-		warnings.push_back(QObject::tr("Could not load the coordinate reference system '%1'.").arg(combined_grid_zone));
+		add_warning(QCoreApplication::translate("OcdFileImport", "Could not load the coordinate reference system '%1'.").arg(combined_grid_zone));
 	}
 	else
 	{

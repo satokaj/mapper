@@ -253,21 +253,19 @@ void OcdFileImport::importGeoreferencing(const QString& param_string, int)
 	// si_ScalePar (type 1039) contains both georeferencing and map grid
 	// display parameters. Georeferencing is delegated to a dedicated class
 	// and grid parameters are processed below.
-	std::list<QString> warnings;
-	Georeferencing georef = OcdGeoref::georefFromString(param_string, warnings);
-	std::for_each(warnings.begin(), warnings.end(),
-	              std::bind(&OcdFileImport::addWarning,
-	                        this, std::placeholders::_1));
+	auto add_warning = [this](const QString& w){ addWarning(w); };
+	Georeferencing georef = OcdGeoref::georefFromString(param_string, add_warning);
 
 	bool ok;
-	for (auto param : param_string.split(QString::fromLatin1("\t")).mid(1))
+	// Not efficient, because allocating a container of string refs.
+	// We don't need the whole vector at once, and we need only a single value.
+	for (const auto& param : param_string.splitRef(QLatin1Char('\t'), QString::SkipEmptyParts))
 	{
-		const QString param_value = param.remove(0, 1);
-		switch (param[0].unicode())
+		switch (param.at(0).unicode())
 		{
 		case 'd':
 			{
-				auto spacing = param_value.toDouble(&ok);
+				auto spacing = param.mid(1).toDouble(&ok);
 				if (ok && spacing >= 0.001)
 				{
 					auto grid = map->getGrid();

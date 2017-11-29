@@ -20,6 +20,7 @@
 #ifndef OCD_GEOREF_H
 #define OCD_GEOREF_H
 
+#include <functional>
 #include <vector>
 
 #include <QString>
@@ -30,11 +31,11 @@ class OcdGeoref
 {
 public:
 	static Georeferencing georefFromString(const QString& param_string,
-		                                       std::list<QString>& warnings);
+	                                       const std::function<void(const QString&)>& add_warning);
 protected:
 	static void applyGridAndZone(Georeferencing& georef,
 	                             const QString& combined_grid_zone,
-	                             std::list<QString>& warnings);
+	                             const std::function<void(const QString&)>& add_warning);
 };
 
 #endif // OCD_GEOREF_H

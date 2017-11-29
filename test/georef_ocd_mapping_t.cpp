@@ -19,7 +19,7 @@
 
 #include "georef_ocd_mapping_t.h"
 
-#include <list>
+#include <vector>
 
 #include <QBuffer>
 #include <QString>
@@ -84,8 +84,9 @@ void GeoreferenceMappingTest::testOcdToMapper()
 	QFETCH(QString, georef_result);
 	QFETCH(bool, warnings_expected);
 
-	std::list<QString> warnings;
-	auto gref = OcdGeoref::georefFromString(si_ScalePar, warnings);
+	std::vector<QString> warnings;
+	auto add_warning = [&warnings](auto w) { warnings.push_back(w); };
+	auto gref = OcdGeoref::georefFromString(si_ScalePar, add_warning);
 	QVERIFY(bool(warnings.size()) == warnings_expected);
 
 	QStringList crs_params;
