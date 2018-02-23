@@ -24,6 +24,7 @@
 
 #include <cmath>
 #include <vector>
+#include <debug/vector>
 
 #include <QtGlobal>
 #include <QCoreApplication>
@@ -656,8 +657,8 @@ constexpr const MapCoordF operator/(const MapCoordF& lhs, qreal divisor);
 
 
 
-typedef std::vector<MapCoord> MapCoordVector;
-typedef std::vector<MapCoordF> MapCoordVectorF;
+typedef __gnu_debug::vector<MapCoord> MapCoordVector;
+typedef __gnu_debug::vector<MapCoordF> MapCoordVectorF;
 
 
 

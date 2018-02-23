@@ -23,6 +23,7 @@
 #define OPENORIENTEERING_PATH_COORD_H
 
 #include <vector>
+#include <debug/vector>
 
 #include <QtGlobal>
 
@@ -187,7 +188,7 @@ public:
 	const PathCoordVector* path_coords;
 	
 	/** Index of the corresponding or preceding path_coord in a vector. */
-	std::vector<PathCoord>::size_type path_coord_index;
+	__gnu_debug::vector<PathCoord>::size_type path_coord_index;
 	
 	/** If true, a bezier edge ends at this split position. */
 	bool is_curve_end;
@@ -231,7 +232,7 @@ public:
 	 */
 	static SplitPathCoord at(
 		const PathCoordVector& path_coords,
-		std::vector<PathCoord>::size_type path_coord_index
+		__gnu_debug::vector<PathCoord>::size_type path_coord_index
 	);
 	
 	/**

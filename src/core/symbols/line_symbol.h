@@ -23,6 +23,7 @@
 #define OPENORIENTEERING_LINE_SYMBOL_H
 
 #include <vector>  // IWYU pragma: keep
+#include <debug/vector>
 
 #include <Qt>
 #include <QtGlobal>
@@ -52,8 +53,8 @@ class SymbolSettingDialog;
 class VirtualCoordVector;
 class VirtualPath;
 
-using MapCoordVector = std::vector<MapCoord>;
-using MapCoordVectorF = std::vector<MapCoordF>;
+using MapCoordVector = __gnu_debug::vector<MapCoord>;
+using MapCoordVectorF = __gnu_debug::vector<MapCoordF>;
 
 
 /** Settings for a line symbol's border. */

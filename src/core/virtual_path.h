@@ -25,6 +25,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <debug/vector>
 
 #include <QRectF>
 
@@ -36,7 +37,7 @@
 
 namespace OpenOrienteering {
 
-class PathCoordVector : public std::vector<PathCoord>
+class PathCoordVector : public __gnu_debug::vector<PathCoord>
 {
 private:
 	friend class SplitPathCoord;

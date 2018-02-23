@@ -21,6 +21,7 @@
 #define OPENORIENTEERING_XML_STREAM_UTIL_H
 
 #include <vector>
+#include <debug/vector>
 
 #include <QtGlobal>
 #include <QHash>
@@ -44,7 +45,7 @@ namespace OpenOrienteering {
 
 class MapCoord;  // IWYU pragma: keep
 
-using MapCoordVector = std::vector<MapCoord>;
+using MapCoordVector = __gnu_debug::vector<MapCoord>;
 
 
 /**

@@ -331,7 +331,7 @@ SplitPathCoord SplitPathCoord::end(const PathCoordVector& path_coords)
 // static
 SplitPathCoord SplitPathCoord::at(
     const PathCoordVector& path_coords,
-    std::vector<PathCoord>::size_type path_coord_index )
+    __gnu_debug::vector<PathCoord>::size_type path_coord_index )
 {
 	Q_ASSERT(path_coord_index < path_coords.size());
 	
