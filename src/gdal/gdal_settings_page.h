@@ -54,7 +54,6 @@ protected:
 	int findDuplicateKey(const QString& key, int row) const;
 	
 private:
-	QCheckBox* import_dxf;
 	QCheckBox* import_gpx;
 	QCheckBox* import_osm;
 	QCheckBox* export_one_layer_per_symbol;

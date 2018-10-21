@@ -3993,10 +3993,10 @@ void MapEditorController::importClicked()
 	
 	QString filename = FileDialog::getOpenFileName(
 	                       window,
-	                       tr("Import %1, GPX, OSM or DXF file").arg(
+	                       tr("Import %1, GPX or OSM file").arg(
 	                           map_names.join(QString::fromLatin1(", "))),
 	                       import_directory,
-	                       QString::fromLatin1("%1 (%2 *.gpx *.osm *.dxf);;%3 (*.*)").arg(
+	                       QString::fromLatin1("%1 (%2 *.gpx *.osm);;%3 (*.*)").arg(
 	                           tr("Importable files"), QLatin1String("*.") + map_extensions.join(QString::fromLatin1(" *.")), tr("All files")) );
 	if (filename.isEmpty() || filename.isNull())
 		return;
@@ -4011,8 +4011,7 @@ void MapEditorController::importClicked()
 		importMapFile(filename, true); // Error reporting in importMapFile()
 		return;
 	}
-	else if (filename.endsWith(QLatin1String(".dxf"), Qt::CaseInsensitive)
-	         || filename.endsWith(QLatin1String(".gpx"), Qt::CaseInsensitive)
+	else if (filename.endsWith(QLatin1String(".gpx"), Qt::CaseInsensitive)
 	         || filename.endsWith(QLatin1String(".osm"), Qt::CaseInsensitive))
 	{
 		// Fallback: Legacy geo file import
