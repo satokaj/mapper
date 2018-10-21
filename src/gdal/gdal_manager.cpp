@@ -52,7 +52,6 @@ public:
 
 	// Enabled formats
 	const QString gdal_gpx_key{ QStringLiteral("gpx") };
-	const QString gdal_osm_key{ QStringLiteral("osm") };
 
 	// Export options
 	const QString ogr_one_layer_per_symbol_key{ QStringLiteral("per_symbol_layer") };
@@ -88,9 +87,6 @@ public:
 			key = gdal_gpx_key;
 			break;
 			
-		case GdalManager::OSM:
-			key = gdal_osm_key;
-			break;
 		}
 		QSettings settings;
 		settings.beginGroup(gdal_manager_group);
@@ -105,10 +101,6 @@ public:
 		{
 		case GdalManager::GPX:
 			key = gdal_gpx_key;
-			break;
-			
-		case GdalManager::OSM:
-			key = gdal_osm_key;
 			break;
 		}
 		QSettings settings;
@@ -247,8 +239,6 @@ private:
 					continue;
 				if (extension == "gpx" && !settings.value(gdal_gpx_key, true).toBool())
 					continue;
-				if (extension == "osm" && !settings.value(gdal_osm_key, true).toBool())
-					continue;
 				enabled_vector_import_extensions.emplace_back(extension);
 			}
 		}
@@ -259,7 +249,7 @@ private:
 		    "shp", "dbf",
 		    "dxf",
 		    /* "gpx", */
-		    /* "osm", */ "pbf",
+		    "osm", "pbf",
 		};
 		enabled_vector_import_extensions.reserve(default_extensions.size() + 3);
 		enabled_vector_import_extensions = default_extensions;
@@ -267,8 +257,6 @@ private:
 		settings.beginGroup(gdal_manager_group);
 		if (settings.value(gdal_gpx_key, true).toBool())
 			enabled_vector_import_extensions.push_back("gpx");
-		if (settings.value(gdal_osm_key, true).toBool())
-			enabled_vector_import_extensions.push_back("osm");
 		settings.endGroup();
 
 		static const std::vector<QByteArray> default_export_extensions = {

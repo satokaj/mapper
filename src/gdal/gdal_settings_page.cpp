@@ -52,9 +52,6 @@ GdalSettingsPage::GdalSettingsPage(QWidget* parent)
 	import_gpx = new QCheckBox(tr("GPX"));
 	form_layout->addRow(import_gpx);
 	
-	import_osm = new QCheckBox(tr("OSM"));
-	form_layout->addRow(import_osm);
-
 	form_layout->addItem(Util::SpacerItem::create(this));
 	form_layout->addRow(Util::Headline::create(tr("Export Options")));
 
@@ -96,7 +93,6 @@ void GdalSettingsPage::apply()
 {
 	GdalManager manager;
 	manager.setFormatEnabled(GdalManager::GPX, import_gpx->isChecked());
-	manager.setFormatEnabled(GdalManager::OSM, import_osm->isChecked());
 	
 	// The file format constructor establishes the extensions.
 	auto format = new OgrFileImportFormat();
@@ -137,7 +133,6 @@ void GdalSettingsPage::updateWidgets()
 {
 	GdalManager manager;
 	import_gpx->setChecked(manager.isFormatEnabled(GdalManager::GPX));
-	import_osm->setChecked(manager.isFormatEnabled(GdalManager::OSM));
 
 	export_one_layer_per_symbol->setChecked(manager.isExportOptionEnabled(GdalManager::OneLayerPerSymbol));
 	
