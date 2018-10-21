@@ -50,8 +50,8 @@ private:
 	TemplateTrack* target_template;
 	MapWidget* widget;
 	QTimer draw_update_timer;
-	bool track_changed_since_last_update;
-	bool is_active;
+	bool track_changed_since_last_update = false;
+	bool is_active = true;
 };
 
 

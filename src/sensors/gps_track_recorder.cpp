@@ -20,7 +20,12 @@
 
 #include "gps_track_recorder.h"
 
+#include <QDateTime>
+
+#include "core/latlon.h"
 #include "core/map.h"
+#include "core/map_view.h"
+#include "core/track.h"
 #include "gui/map/map_widget.h"
 #include "sensors/gps_display.h"
 #include "templates/template_track.h"
@@ -29,15 +34,11 @@
 namespace OpenOrienteering {
 
 GPSTrackRecorder::GPSTrackRecorder(GPSDisplay* gps_display, TemplateTrack* target_template, int draw_update_interval_milliseconds, MapWidget* widget)
- : QObject()
+: QObject()
+, gps_display(gps_display)
+, target_template(target_template)
+, widget(widget)
 {
-	this->gps_display = gps_display;
-	this->target_template = target_template;
-	this->widget = widget;
-	
-	track_changed_since_last_update = false;
-	is_active = true;
-	
 	// Start with a new segment
 	target_template->getTrack().finishCurrentSegment();
 	
@@ -72,9 +73,8 @@ void GPSTrackRecorder::positionUpdatesInterrupted()
 	track_changed_since_last_update = true;
 }
 
-void GPSTrackRecorder::templateDeleted(int pos, const Template* old_temp)
+void GPSTrackRecorder::templateDeleted(int /* pos */, const Template* old_temp)
 {
-	Q_UNUSED(pos);
 	if (!is_active)
 		return;
 	
