@@ -31,26 +31,23 @@
 #include <Qt>
 #include <QtMath>
 #include <QAccelerometer>
-#include <QAccelerometerReading>
+#include <QAccelerometerReading>  // IWYU pragma: keep
 #include <QGyroscope>
 #include <QGyroscopeFilter>
 #include <QGyroscopeReading>
 #include <QList>
 #include <QMagnetometer>
-#include <QMagnetometerReading>
+#include <QMagnetometerReading>  // IWYU pragma: keep
 #include <QMutex>
 #include <QMutexLocker>
 #include <QSensor>
 #include <QThread>
+#include <QTime>  // IWYU pragma: keep
 #include <QWaitCondition>
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras/QAndroidJniObject>
 #endif
-
-#else  // no Qt Sensors lib
-
-#include <QTime>
 
 #endif  // QT_SENSORS_LIB
 
@@ -392,6 +389,11 @@ private:
 		
 		void filter()
 		{
+#ifdef MAPPER_FAKE_POSITION_SOURCE
+			const auto acceleration = SensorHelpers::Vector{ 0, 0, 9.8 };
+			const auto offset = QTime::currentTime().msecsSinceStartOfDay() / qreal(20000);
+			const auto geomagnetic = SensorHelpers::Vector{ qreal(3 + qRound(10 * qSin(offset))), 100, 100 };
+#else
 			if (p->accelerometer.reading() == nullptr
 			    || p->magnetometer.reading() == nullptr)
 				return;
@@ -400,6 +402,8 @@ private:
 			// does not overwrite parts of them while they are being copied)
 			const auto acceleration = SensorHelpers::toVector(*p->accelerometer.reading());
 			const auto geomagnetic = SensorHelpers::toVector(*p->magnetometer.reading());
+			
+#endif  // MAPPER_FAKE_POSITION_SOURCE
 			
 			// Calculate orientation from accelerometer and magnetometer (acc_mag_orientation)
 			bool ok = false;
@@ -537,10 +541,6 @@ qreal Compass::getCurrentAzimuth()
 {
 #ifdef QT_SENSORS_LIB
 	return p->getLatestAzimuth();
-#elif MAPPER_DEVELOPMENT_BUILD
-	// DEBUG: rotate around ...
-	QTime now = QTime::currentTime();
-	return 360 * (now.msecsSinceStartOfDay() % (10 * 1000)) / qreal(10 * 1000);
 #else
 	return 0;
 #endif
