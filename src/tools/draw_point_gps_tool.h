@@ -21,6 +21,7 @@
 #ifndef OPENORIENTEERING_DRAW_POINT_GPS_H
 #define OPENORIENTEERING_DRAW_POINT_GPS_H
 
+#include <QtGlobal>
 #include <QObject>
 #include <QPointer>
 #include <QScopedPointer>
@@ -55,7 +56,7 @@ public:
 	~DrawPointGPSTool() override;
 	
 public slots:
-	void newGPSPosition(const MapCoordF& coord, float accuracy);
+	void newGPSPosition(const MapCoordF& coord, qreal accuracy);
 	
 protected slots:
 	void activeSymbolChanged(const Symbol* symbol);

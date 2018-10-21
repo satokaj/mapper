@@ -86,8 +86,8 @@ public:
 	bool hasValidPosition() const { return has_valid_position; }
 	/// Returns the latest received GPS coord. Check hasValidPosition() beforehand!
 	const MapCoordF& getLatestGPSCoord() const { return latest_gps_coord; }
-	/// Returns the accuracy of the latest received GPS coord, or -1 if unknown. Check hasValidPosition() beforehand!
-	float getLatestGPSCoordAccuracy() const { return latest_gps_coord_accuracy; }
+	/// Returns the accuracy of the latest received GPS coord, or NaN if unknown. Check hasValidPosition() beforehand!
+	qreal getLatestGPSCoordAccuracy() const { return latest_gps_coord_accuracy; }
 	
 	/// Starts quick blinking for one or more seconds.
 	void startBlinking(int seconds);
@@ -105,12 +105,12 @@ protected:
 signals:
 	/// Is emitted whenever a new position update happens.
 	/// If the accuracy is unknown, -1 will be given.
-	void mapPositionUpdated(const MapCoordF& coord, float accuracy);
+	void mapPositionUpdated(const MapCoordF& coord, qreal accuracy);
 	
 	/// Like mapPositionUpdated(), but gives the values as
 	/// latitude / longitude in degrees and also gives altitude
 	/// (meters above sea level; -9999 is unknown)
-	void latLonUpdated(double latitude, double longitude, double altitude, float accuracy);
+	void latLonUpdated(double latitude, double longitude, double altitude, qreal accuracy);
 	
 	/// Is emitted when updates are interrupted after previously being active,
 	/// due to loss of satellite reception or another error such as the user
@@ -160,7 +160,7 @@ private:
 	const Georeferencing& georeferencing;
 	QGeoPositionInfoSource* source = nullptr;
 	MapCoordF latest_gps_coord;
-	float latest_gps_coord_accuracy = 0;
+	qreal latest_gps_coord_accuracy = 0;
 	PulsatingOpacity pulsating_opacity;
 	int blink_count = 0;
 	bool tracking_lost             = false;

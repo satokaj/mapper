@@ -109,10 +109,8 @@ void GPSTemporaryMarkers::paint(QPainter* painter)
 	painter->restore();
 }
 
-void GPSTemporaryMarkers::newGPSPosition(const MapCoordF& coord, float accuracy)
+void GPSTemporaryMarkers::newGPSPosition(const MapCoordF& coord, qreal /*accuracy*/)
 {
-	Q_UNUSED(accuracy);
-
 	if (recording_path && ! paths.empty())
 	{
 		std::vector< QPointF >& path_coords = paths.back();
