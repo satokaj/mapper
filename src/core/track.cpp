@@ -42,14 +42,9 @@ MapCoordF fakeMapCoordF(const LatLon &latlon)
 	return MapCoordF(latlon.longitude(), latlon.latitude());
 }
 
-TrackPoint::TrackPoint(LatLon coord, const QDateTime& datetime, float elevation, int num_satellites, float hDOP)
-{
-	gps_coord = coord;
-	this->datetime = datetime;
-	this->elevation = elevation;
-	this->num_satellites = num_satellites;
-	this->hDOP = hDOP;
-}
+
+// ### TrackPoint ###
+
 void TrackPoint::save(QXmlStreamWriter* stream) const
 {
 	stream->writeAttribute(QStringLiteral("lat"), QString::number(gps_coord.latitude(), 'f', 12));
@@ -57,12 +52,10 @@ void TrackPoint::save(QXmlStreamWriter* stream) const
 	
 	if (datetime.isValid())
 		stream->writeTextElement(QStringLiteral("time"), datetime.toString(Qt::ISODate));
-	if (elevation > -9999)
+	if (!qIsNaN(elevation))
 		stream->writeTextElement(QStringLiteral("ele"), QString::number(elevation, 'f', 3));
-	if (num_satellites >= 0)
-		stream->writeTextElement(QStringLiteral("sat"), QString::number(num_satellites));
-	if (hDOP >= 0)
-		stream->writeTextElement(QStringLiteral("hdop"), QString::number(hDOP, 'f', 3));
+	if (!qIsNaN(hDOP))
+		stream->writeTextElement(QStringLiteral("hdop"), QString::number(qreal(hDOP), 'f', 3));
 }
 
 
@@ -343,8 +336,8 @@ bool Track::loadFromGPX(QFile* file, bool project_points, QWidget* dialog_parent
 			    || stream.name().compare(QLatin1String("trkpt"), Qt::CaseInsensitive) == 0
 				|| stream.name().compare(QLatin1String("rtept"), Qt::CaseInsensitive) == 0)
 			{
-				point = TrackPoint(LatLon(stream.attributes().value(QLatin1String("lat")).toDouble(),
-				                          stream.attributes().value(QLatin1String("lon")).toDouble()));
+				point = TrackPoint{LatLon{stream.attributes().value(QLatin1String("lat")).toDouble(),
+				                          stream.attributes().value(QLatin1String("lon")).toDouble()}};
 				if (project_points)
 					point.map_coord = map_georef.toMapCoordF(point.gps_coord); // TODO: check for errors
 				point_name.clear();
@@ -359,11 +352,9 @@ bool Track::loadFromGPX(QFile* file, bool project_points, QWidget* dialog_parent
 				}
 			}
 			else if (stream.name().compare(QLatin1String("ele"), Qt::CaseInsensitive) == 0)
-				point.elevation = stream.readElementText().toFloat();
+				point.elevation = stream.readElementText().toDouble();
 			else if (stream.name().compare(QLatin1String("time"), Qt::CaseInsensitive) == 0)
 				point.datetime = QDateTime::fromString(stream.readElementText(), Qt::ISODate);
-			else if (stream.name().compare(QLatin1String("sat"), Qt::CaseInsensitive) == 0)
-				point.num_satellites = stream.readElementText().toInt();
 			else if (stream.name().compare(QLatin1String("hdop"), Qt::CaseInsensitive) == 0)
 				point.hDOP = stream.readElementText().toFloat();
 			else if (stream.name().compare(QLatin1String("name"), Qt::CaseInsensitive) == 0)

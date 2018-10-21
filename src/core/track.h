@@ -22,8 +22,10 @@
 #ifndef OPENORIENTEERING_TRACK_H
 #define OPENORIENTEERING_TRACK_H
 
+#include <cmath>
 #include <vector>
 
+#include <QtNumeric>
 #include <QDateTime>
 #include <QString>
 
@@ -39,21 +41,37 @@ namespace OpenOrienteering {
 
 
 /**
- * A point in a track or a waypoint, which stores position on ellipsoid and
- * map and more attributes (e.g. number of satellites)
+ * A geographic point in a track or a waypoint.
+ * 
+ * A TrackPoint stores position on ellipsoid and on map, and more attributes.
  */
 struct TrackPoint
 {
-	LatLon gps_coord;
-	MapCoordF map_coord;
+	LatLon gps_coord    = {};
+	QDateTime datetime  = {};       // QDateTime() if invalid
+	double elevation    = qQNaN();  // NaN if invalid
+	float hDOP          = NAN;      // NaN if invalid
+	MapCoordF map_coord = {};
 	
-	QDateTime datetime;		// QDateTime() if invalid
-	float elevation;		// -9999 if invalid
-	int num_satellites;		// -1 if invalid
-	float hDOP;				// -1 if invalid
+	// Default special member functions are fine.
+	// \todo Remove the special member functions after dropping Android gcc 4.9.
+#if __GNUC__ == 4
+	TrackPoint() = default;
+	TrackPoint(const TrackPoint&) = default;
+	TrackPoint(LatLon gps_coord,
+	           QDateTime datetime  = {},
+	           double elevation    = qQNaN(),
+	           float hDOP          = NAN,
+	           MapCoordF map_coord = {} )
+	: gps_coord(gps_coord)
+	, datetime(datetime)
+	, elevation(elevation)
+	, hDOP(hDOP)
+	, map_coord(map_coord)
+	{}
+	~TrackPoint() = default;
+#endif
 	
-	TrackPoint(LatLon coord = LatLon(), const QDateTime& datetime = QDateTime(),
-			   float elevation = -9999, int num_satellites = -1, float hDOP = -1);
 	void save(QXmlStreamWriter* stream) const;
 };
 
