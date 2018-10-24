@@ -32,7 +32,6 @@
 #include <QIODevice>
 #include <QLatin1String>
 #include <QStringRef>
-#include <QTransform>
 #include <QXmlStreamAttributes>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -83,10 +82,7 @@ Track::Track(const Track& other)
 	*this = other;
 }
 
-Track::~Track()
-{
-	delete track_crs;
-}
+Track::~Track() = default;
 
 Track& Track::operator=(const Track& rhs)
 {
@@ -106,11 +102,6 @@ Track& Track::operator=(const Track& rhs)
 	
 	map_georef = rhs.map_georef;
 	
-	if (rhs.track_crs)
-	{
-		track_crs = new Georeferencing(*rhs.track_crs);
-	}
-	
 	return *this;
 }
 
@@ -122,8 +113,6 @@ void Track::clear()
 	segment_starts.clear();
 	segment_names.clear();
 	current_segment_finished = true;
-	delete track_crs;
-	track_crs = nullptr;
 }
 
 bool Track::loadFrom(const QString& path, bool project_points)
@@ -192,6 +181,13 @@ bool Track::saveTo(const QString& path) const
 	return true;
 }
 
+
+QString Track::crsSpec() const
+{
+	return Georeferencing::geographic_crs_spec;
+}
+
+
 void Track::appendTrackPoint(const TrackPoint& point)
 {
 	segment_points.push_back(point);
@@ -218,14 +214,6 @@ void Track::appendWaypoint(const TrackPoint& point, const QString& name)
 void Track::changeMapGeoreferencing(const Georeferencing& new_map_georef)
 {
 	map_georef = new_map_georef;
-	
-	projectPoints();
-}
-
-void Track::setTrackCRS(Georeferencing* track_crs)
-{
-	delete this->track_crs;
-	this->track_crs = track_crs;
 	
 	projectPoints();
 }
@@ -309,10 +297,6 @@ LatLon Track::calcAveragePosition() const
 
 bool Track::loadFromGPX(QFile* file, bool project_points)
 {
-	track_crs = new Georeferencing();
-	track_crs->setProjectedCRS({}, Georeferencing::geographic_crs_spec);
-	track_crs->setTransformationDirectly(QTransform());
-	
 	TrackPoint point;
 	QString point_name;
 
@@ -377,20 +361,10 @@ bool Track::loadFromGPX(QFile* file, bool project_points)
 void Track::projectPoints()
 {
 	/// \todo Check for errors from Georeferencing::toMapCoordF()
-	if (track_crs->getProjectedCRSSpec() == Georeferencing::geographic_crs_spec)
-	{
-		for (auto& waypoint : waypoints)
-			waypoint.map_coord = map_georef.toMapCoordF(waypoint.gps_coord, nullptr); 
-		for (auto& segment_point : segment_points)
-			segment_point.map_coord = map_georef.toMapCoordF(segment_point.gps_coord, nullptr); 
-	}
-	else
-	{
-		for (auto& waypoint : waypoints)
-			waypoint.map_coord = map_georef.toMapCoordF(track_crs, fakeMapCoordF(waypoint.gps_coord), nullptr); 
-		for (auto& segment_point : segment_points)
-			segment_point.map_coord = map_georef.toMapCoordF(track_crs, fakeMapCoordF(segment_point.gps_coord), nullptr); 
-	}
+	for (auto& waypoint : waypoints)
+		waypoint.map_coord = map_georef.toMapCoordF(waypoint.gps_coord, nullptr); 
+	for (auto& segment_point : segment_points)
+		segment_point.map_coord = map_georef.toMapCoordF(segment_point.gps_coord, nullptr); 
 }
 
 

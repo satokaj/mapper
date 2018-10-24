@@ -112,7 +112,6 @@ protected:
 	
 	
 	Track track;
-	QString track_crs_spec;
 	QString projected_crs_spec;
 	friend class OgrTemplate; // for migration
 	std::unique_ptr<Georeferencing> preserved_georef;

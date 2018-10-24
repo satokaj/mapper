@@ -100,6 +100,9 @@ public:
 	/// Attempts to save the track to the given file
 	bool saveTo(const QString& path) const;
 	
+	/// Returns the track's CRS specification (PROJ.4 format).
+	QString crsSpec() const;
+	
 	// Modifiers
 	
 	/**
@@ -127,10 +130,6 @@ public:
 	/** Updates the map positions of all points based on the new georeferencing. */
 	void changeMapGeoreferencing(const Georeferencing& new_map_georef);
 	
-	/// Sets the track coordinate reference system.
-	/// The Track object takes ownership of the Georeferencing object.
-	void setTrackCRS(Georeferencing* track_crs);
-	
 	// Getters
 	int getNumSegments() const;
 	int getSegmentPointCount(int segment_number) const;
@@ -140,9 +139,6 @@ public:
 	int getNumWaypoints() const;
 	const TrackPoint& getWaypoint(int number) const;
 	const QString& getWaypointName(int number) const;
-	
-	bool hasTrackCRS() const {return track_crs;}
-	Georeferencing* getTrackCRS() const {return track_crs;}
 	
 	/// Averages all track coordinates
 	LatLon calcAveragePosition() const;
@@ -164,7 +160,6 @@ private:
 	std::vector<int> segment_starts;
 	std::vector<QString> segment_names;
 	
-	Georeferencing* track_crs = nullptr;
 	Georeferencing map_georef;
 	
 	bool current_segment_finished = true;
