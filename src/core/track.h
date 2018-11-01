@@ -46,7 +46,7 @@ namespace OpenOrienteering {
  */
 struct TrackPoint
 {
-	LatLon gps_coord;
+	LatLon latlon;
 	QDateTime datetime;             // QDateTime() if invalid
 	float elevation     = NAN;      // NaN if invalid
 	float hDOP          = NAN;      // NaN if invalid
@@ -57,12 +57,12 @@ struct TrackPoint
 #if __GNUC__ == 4
 	TrackPoint() = default;
 	TrackPoint(const TrackPoint&) = default;
-	TrackPoint(LatLon gps_coord,
+	TrackPoint(LatLon latlon,
 	           QDateTime datetime  = {},
 	           float elevation     = NAN,
 	           float hDOP          = NAN,
 	           MapCoordF map_coord = {} )
-	: gps_coord(gps_coord)
+	: latlon(latlon)
 	, datetime(datetime)
 	, elevation(elevation)
 	, hDOP(hDOP)
