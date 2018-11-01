@@ -1,6 +1,6 @@
 /*
  *    Copyright 2012-2014 Thomas Schöps
- *    Copyright 2013-2017 Kai Pastor
+ *    Copyright 2013-2018 Kai Pastor
  *
  *    This file is part of OpenOrienteering.
  *
@@ -26,8 +26,10 @@
 
 #include <QtGlobal>
 #include <QObject>
+#include <QPainterPath>
 #include <QRectF>
 #include <QString>
+#include <QVarLengthArray>
 
 #include "core/track.h"
 #include "templates/template.h"
@@ -101,19 +103,26 @@ protected:
     void saveTypeSpecificTemplateConfiguration(QXmlStreamWriter& xml) const override;
     bool loadTypeSpecificTemplateConfiguration(QXmlStreamReader& xml) override;
 	
-	/// Projects the track in non-georeferenced mode
+	/// Returns the georeferencing to be used for projecting the track data.
+	const Georeferencing& georeferencing() const;
+	
+	/// Calculates a projection for non-georeferenced mode
 	QString calculateLocalGeoreferencing() const;
 	
-	void applyProjectedCrsSpec();
+	void setCustomProjection(const QString& projected_crs_spec);
+	
+	void projectPoints();
 	
 	PathObject* importPathStart();
 	void importPathEnd(PathObject* path);
 	PointObject* importWaypoint(const MapCoordF& position, const QString &name = QString());
 	
 	
+	std::vector<QPointF> waypoints;
+	QVarLengthArray<QPainterPath, 4> track_segments;
 	Track track;
 	QString track_crs_spec;
-	QString projected_crs_spec;
+	std::unique_ptr<Georeferencing> projected_georef;
 	friend class OgrTemplate; // for migration
 	std::unique_ptr<Georeferencing> preserved_georef;
 	
