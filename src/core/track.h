@@ -82,8 +82,8 @@ inline bool operator!=(const TrackPoint& lhs, const TrackPoint& rhs) { return !(
 
 /**
  * Stores a set of tracks and / or waypoints, e.g. taken from a GPS device.
- * Can optionally store a track coordinate reference system in track_georef;
- * if no track CRS is given, assumes that coordinates are geographic WGS84 coordinates
+ * 
+ * All coordinates are assumed to be geographic WGS84 coordinates.
  */
 class Track
 {
@@ -104,6 +104,9 @@ public:
 	bool loadFrom(const QString& path, bool project_points, QWidget* dialog_parent = nullptr);
 	/// Attempts to save the track to the given file
 	bool saveTo(const QString& path) const;
+	
+	/// Returns the track's CRS specification (PROJ.4 format).
+	QString crsSpec() const;
 	
 	// Modifiers
 	
@@ -132,10 +135,6 @@ public:
 	/** Updates the map positions of all points based on the new georeferencing. */
 	void changeMapGeoreferencing(const Georeferencing& new_georef);
 	
-	/// Sets the track coordinate reference system.
-	/// The Track object takes ownership of the Georeferencing object.
-	void setTrackCRS(Georeferencing* track_crs);
-	
 	// Getters
 	int getNumSegments() const;
 	int getSegmentPointCount(int segment_number) const;
@@ -144,9 +143,6 @@ public:
 	int getNumWaypoints() const;
 	const TrackPoint& getWaypoint(int number) const;
 	const QString& getWaypointName(int number) const;
-	
-	bool hasTrackCRS() const {return track_crs;}
-	Georeferencing* getTrackCRS() const {return track_crs;}
 	
 	/// Averages all track coordinates
 	LatLon calcAveragePosition() const;
@@ -169,7 +165,6 @@ private:
 	
 	bool current_segment_finished;
 	
-	Georeferencing* track_crs;
 	Georeferencing map_georef;
 	
 	friend bool operator==(const Track& lhs, const Track& rhs);
@@ -178,10 +173,10 @@ private:
 /**
  * Compares waypoints, segments, and track points for equality.
  * 
- * This operator does not (explicitly) compare the tracks' data CRS or map
- * georeferencing. When these features are actually used, they affect the
- * projection to map coordinates, and so their effects are recorded in the
- * waypoints and track points.
+ * This operator does not (explicitly) compare the tracks' map georeferencing.
+ * When this feature is actually used, it affects the projection to map
+ * coordinates, and so its effects are recorded in the waypoints and track
+ * points.
  */
 bool operator==(const Track& lhs, const Track& rhs);
 
