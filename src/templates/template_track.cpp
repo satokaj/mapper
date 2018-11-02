@@ -59,6 +59,8 @@ TemplateTrack::TemplateTrack(const QString& path, Map* map)
 	connect(&georef, &Georeferencing::transformationChanged, this, &TemplateTrack::updateGeoreferencing);
 	connect(&georef, &Georeferencing::stateChanged, this, &TemplateTrack::updateGeoreferencing);
 	connect(&georef, &Georeferencing::declinationChanged, this, &TemplateTrack::updateGeoreferencing);
+	
+	connect(&track, &Track::trackChanged, this, &TemplateTrack::trackChanged);
 }
 
 TemplateTrack::~TemplateTrack()
@@ -337,7 +339,7 @@ int TemplateTrack::getTemplateBoundingBoxPixelBorder()
 Template* TemplateTrack::duplicateImpl() const
 {
 	TemplateTrack* copy = new TemplateTrack(template_path, map);
-	copy->track = track;
+	copy->track.copyFrom(track);
 	return copy;
 }
 
@@ -476,6 +478,24 @@ void TemplateTrack::updateGeoreferencing()
 	}
 }
 
+void TemplateTrack::trackChanged(Track::TrackChange change, const TrackPoint& point)
+{
+	const auto& georef = georeferencing();
+	switch (change)
+	{
+	case Track::NewSegment:
+		track_segments.push_back({});
+		track_segments.back().moveTo(georef.toMapCoordF(point.latlon));
+		break;
+	case Track::TrackPointAppended:
+		track_segments.back().lineTo(georef.toMapCoordF(point.latlon));
+		break;
+	case Track::WaypointAppended:
+		waypoints.push_back(georef.toMapCoordF(point.latlon));
+		break;
+	}
+}
+
 const Georeferencing& TemplateTrack::georeferencing() const
 {
 	return projected_georef ? *projected_georef : map->getGeoreferencing();
@@ -512,10 +532,11 @@ void TemplateTrack::projectPoints()
 	{
 		auto& painter_path = track_segments[i];
 		painter_path = {};
-		if (auto num_waypoints = track.getSegmentPointCount(i))
+		track_segment_length = track.getSegmentPointCount(i);
+		if (track_segment_length)
 		{
 		    painter_path.moveTo(georef.toMapCoordF(track.getSegmentPoint(i, 0).latlon));
-			for (int j = 1; j < num_waypoints; ++j)
+			for (int j = 1; j < track_segment_length; ++j)
 				painter_path.lineTo(georef.toMapCoordF(track.getSegmentPoint(i, j).latlon));
 		}
 	}

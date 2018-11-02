@@ -97,6 +97,8 @@ public:
 public slots:
 	void updateGeoreferencing();
 	
+	void trackChanged(Track::TrackChange change, const TrackPoint& point);
+	
 protected:
 	Template* duplicateImpl() const override;
 	
@@ -120,6 +122,7 @@ protected:
 	
 	std::vector<QPointF> waypoints;
 	QVarLengthArray<QPainterPath, 4> track_segments;
+	int track_segment_length = 0;  // length of 'current' track segment
 	Track track;
 	QString track_crs_spec;
 	std::unique_ptr<Georeferencing> projected_georef;
