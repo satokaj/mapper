@@ -47,6 +47,7 @@ struct TrackPoint
 	QDateTime datetime;             // QDateTime() if invalid
 	float elevation     = NAN;      // NaN if invalid
 	float hDOP          = NAN;      // NaN if invalid
+	QString name;
 	
 	// Default special member functions are fine.
 	// \todo Remove the special member functions after dropping Android gcc 4.9.
@@ -56,11 +57,13 @@ struct TrackPoint
 	TrackPoint(LatLon latlon,
 	           QDateTime datetime  = {},
 	           float elevation     = NAN,
-	           float hDOP          = NAN )
+	           float hDOP          = NAN,
+	           QString name        = {} )
 	: latlon(latlon)
 	, datetime(datetime)
 	, elevation(elevation)
 	, hDOP(hDOP)
+	, name(name)
 	{}
 	~TrackPoint() = default;
 #endif
@@ -117,7 +120,7 @@ public:
 	void finishCurrentSegment();
 	
 	/// Appends a waypoint.
-	void appendWaypoint(const TrackPoint& point, const QString& name);
+	void appendWaypoint(const TrackPoint& point);
 	
 	
 	// Getters
@@ -127,7 +130,6 @@ public:
 	
 	int getNumWaypoints() const;
 	const TrackPoint& getWaypoint(int number) const;
-	const QString& getWaypointName(int number) const;
 	
 	/// Averages all track coordinates
 	LatLon calcAveragePosition() const;
@@ -137,7 +139,6 @@ public:
 	
 private:
 	std::vector<TrackPoint> waypoints;
-	std::vector<QString> waypoint_names;
 	
 	std::vector<TrackPoint> segment_points;
 	// The indices of the first points of every track segment in this track
